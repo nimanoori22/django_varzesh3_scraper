@@ -1,3 +1,13 @@
 <hr>
-<h1>this is body</h1>
+<div class=myscroller>
+    {% for post in posts %}
+        <article>
+            <div class=card>
+                <a href="{{ post.get_absolute_url }}"><p class="mytitle">{{ post.title }}</p></a>
+                <img class="myimage" src="" alt="">
+                <p class=mytext>{{ post.lead }}</p>
+            </div>
+        </article>
+    {% endfor %}
+</div>
 <hr>

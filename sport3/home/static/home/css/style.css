@@ -1,7 +1,44 @@
 body {
     background-color: #e3e5e6;
+    direction: rtl;    
 }
 
 h1 {
     color: red;
+}
+
+.card {
+    width: 70%;
+    height: 200px;
+    line-height: 20px;
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.5);;
+    text-align: right;
+    border-radius: 25px;
+    float: left;
+    margin: 5px;
+    background-color: white;
+    text-align: center;
+}
+
+.mytext {
+    padding: 10px 50px;
+    position: relative;
+
+    
+}
+
+.mytitle {
+    position: relative;
+    bottom: 10px;
+    padding: 10px 50px;
+    font-size: 20px;
+
+}
+
+.myimage {
+    float: right;
+}
+
+.myscroller {
+    /* overflow: scroll; */
 }

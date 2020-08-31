@@ -1,5 +1,6 @@
 from django.db import models
 from ckeditor.fields import RichTextField
+from django.shortcuts import reverse
 # Create your models here.
 
 class MyNewsFb(models.Model):
@@ -7,6 +8,9 @@ class MyNewsFb(models.Model):
     url = models.URLField(unique=True)
     lead = models.CharField(max_length=250)
     content = RichTextField()
+
+    def get_absolute_url(self):
+        return reverse('post_detail', kwargs={'id': self.id})
 
     def __str__(self):
         return self.title
