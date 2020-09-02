@@ -8,6 +8,7 @@ class MyNewsFb(models.Model):
     url = models.URLField(unique=True)
     lead = models.CharField(max_length=250)
     content = RichTextField()
+    time_created_varzesh3 = models.DateTimeField(null=True, blank=True)
 
     def get_absolute_url(self):
         return reverse('post_detail', kwargs={'id': self.id})

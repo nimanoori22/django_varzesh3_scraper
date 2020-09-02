@@ -5,9 +5,71 @@ from news.models import MyNewsFb
 
 links = []
 
+def time_maker(datee):
+    mylist = (datee.split('/'))
+
+    for item in mylist:
+        if '0' in item:
+            new = item.replace('0', '')
+            mylist[mylist.index(item)] = new
+    num_list = []
+    for num in mylist:
+        num_list.append(int(num))
+    return num_list
+
 
 class Command(BaseCommand):
     help = 'collect football news'
+
+    def jalali_to_gregorian(self, jy, jm, jd):
+        jy += 1595
+        days = -355668 + (365 * jy) + ((jy // 33) * 8) + (((jy % 33) + 3) // 4) + jd
+        if (jm < 7):
+            days += (jm - 1) * 31
+        else:
+            days += ((jm - 7) * 30) + 186
+        gy = 400 * (days // 146097)
+        days %= 146097
+        if (days > 36524):
+            days -= 1
+            gy += 100 * (days // 36524)
+            days %= 36524
+            if (days >= 365):
+                days += 1
+        gy += 4 * (days // 1461)
+        days %= 1461
+        if (days > 365):
+            gy += ((days - 1) // 365)
+            days = (days - 1) % 365
+        gd = days + 1
+        if ((gy % 4 == 0 and gy % 100 != 0) or (gy % 400 == 0)):
+            kab = 29
+        else:
+            kab = 28
+        sal_a = [0, 31, kab, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+        gm = 0
+        while (gm < 13 and gd > sal_a[gm]):
+            gd -= sal_a[gm]
+            gm += 1
+        return [gy, gm, gd]
+
+    def time_maker(self, datee):
+        mylist = (datee.split('/'))
+
+        for item in mylist:
+            if '0' in item:
+                new = item.replace('0', '')
+                mylist[mylist.index(item)] = new
+        num_list = []
+        for num in mylist:
+            num_list.append(int(num))
+        return num_list
+    
+    def time_format(self, engdate):
+        temp = ''
+        for myitem in engdate:
+            temp = temp + str(myitem) + '-'
+        return(temp[:-1])
 
     def handle(self, *args, **kwargs):
         with requests.session() as s:
@@ -20,13 +82,25 @@ class Command(BaseCommand):
                         links.append('https://www.varzesh3.com/' + str(a['href']))
 
             mylinks = list(dict.fromkeys(links))
-            print(mylinks)
             for link in mylinks:
-                page1 = s.get(link)
-                soup1 = bs(page1.content, 'html.parser')
-                news_lead = soup1.select('.news-page--news-lead')
-                news_title = soup1.select('.news-page--news-title')
-                news_text = soup1.select('.news-page--news-text')
+                try:
+                    page1 = s.get(link)
+                    soup1 = bs(page1.content, 'html.parser')
+                    date = soup1.select_one('.numeric-value:nth-child(3)').text
+                    news_lead = soup1.select('.news-page--news-lead')
+                    news_title = soup1.select('.news-page--news-title')
+                    news_text = soup1.select('.news-page--news-text')
+                    print(date)
+                except:
+                    continue
+                try:
+                    mydate = self.time_maker(date)
+                except:
+                    print(link)
+
+                myengdate = self.jalali_to_gregorian(mydate[0], mydate[1], mydate[2])
+
+                thetime = self.time_format(myengdate)
 
                 for n, t, mt, in zip(news_lead, news_title, news_text):
                     lead = n.text
@@ -40,6 +114,7 @@ class Command(BaseCommand):
                             title=title,
                             lead=lead,
                             content=content,
+                            time_created_varzesh3 = thetime
                         )
                         print('%s added' % (title,))
                     except:
