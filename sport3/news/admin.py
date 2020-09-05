@@ -2,7 +2,8 @@ from django.contrib import admin
 from .models import MyNewsFb
 # Register your models here.
 
-# class MyNewsFbAdmin(admin.ModelAdmin):
-#     prepopulated_fields = {'myurl': ('title', )}
+class MyNewsFbAdmin(admin.ModelAdmin):
+    list_display = ('title', 'mytime', 'mydate')
 
-admin.site.register(MyNewsFb)
+
+admin.site.register(MyNewsFb, MyNewsFbAdmin)

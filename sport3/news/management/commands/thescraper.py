@@ -5,18 +5,6 @@ from news.models import MyNewsFb
 
 links = []
 
-def time_maker(datee):
-    mylist = (datee.split('/'))
-
-    for item in mylist:
-        if '0' in item:
-            new = item.replace('0', '')
-            mylist[mylist.index(item)] = new
-    num_list = []
-    for num in mylist:
-        num_list.append(int(num))
-    return num_list
-
 
 class Command(BaseCommand):
     help = 'collect football news'
@@ -71,6 +59,12 @@ class Command(BaseCommand):
             temp = temp + str(myitem) + '-'
         return(temp[:-1])
 
+    def date_format_created(self, endatelist, atime):
+        timelist = atime.split(':')
+        return [endatelist[0],endatelist[1], endatelist[2], timelist[0], timelist[1],]
+
+    
+
     def handle(self, *args, **kwargs):
         with requests.session() as s:
             page = s.get('https://www.varzesh3.com/')
@@ -87,6 +81,7 @@ class Command(BaseCommand):
                     page1 = s.get(link)
                     soup1 = bs(page1.content, 'html.parser')
                     date = soup1.select_one('.numeric-value:nth-child(3)').text
+                    time = soup1.select_one('.numeric-value:nth-child(2)').text
                     news_lead = soup1.select('.news-page--news-lead')
                     news_title = soup1.select('.news-page--news-title')
                     news_text = soup1.select('.news-page--news-text')
@@ -102,6 +97,8 @@ class Command(BaseCommand):
 
                 thetime = self.time_format(myengdate)
 
+                mytime = self.date_format_created(myengdate, time)
+
                 for n, t, mt, in zip(news_lead, news_title, news_text):
                     lead = n.text
                     title = t.text
@@ -114,7 +111,8 @@ class Command(BaseCommand):
                             title=title,
                             lead=lead,
                             content=content,
-                            time_created_varzesh3 = thetime
+                            mydate=thetime,
+                            mytime=time,
                         )
                         print('%s added' % (title,))
                     except:

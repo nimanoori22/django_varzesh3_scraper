@@ -24,3 +24,6 @@ urlpatterns = [
     path('', views.homeview, name='home'),
     path('news/football/<int:id>/', views.postdetail, name='post_detail'),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
